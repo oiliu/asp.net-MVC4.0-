@@ -1,5 +1,5 @@
 # asp.net-MVC4.0-上传多个文件
-1、git status		//查看是否有改动
+1、git status		//查看是否有改动<br/>
 2、git diff		//查看是否是本次改动的
 3、git add .		//提交已改动文件到本地
 4、git commit -m ''	//为本次提交增加备注信息
