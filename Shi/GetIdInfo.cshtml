@@ -1,0 +1,44 @@
+﻿@{
+    ViewBag.Title = "GetIdInfo";
+}
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>GetIdInfo</title>
+    <link href="//cdn.bootcss.com/bootstrap/4.0.0-alpha.2/css/bootstrap.min.css" rel="stylesheet">
+    <script type="text/javascript" src="http://cdn.hcharts.cn/jquery/jquery-2.1.4.min.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $("button").click(function () {
+                var txtId = $("#txtId").val();
+                if (txtId != "") {
+                    $.ajax({
+                        type: "post",
+                        url: "/Shi/GetInfoById?ID=" + txtId + "&t=" + Math.random(),
+                        contentType: "application/json",
+                        success: function (result) {
+                            var resultJson = eval("(" + result + ")");
+                            if (resultJson.retMsg == "success") {
+                                $("form").append('<span><em style="color:red">F12</em>→<em style="color:green">Console</em>查看结果</span>')
+                            } else {
+                                alert("获取失败！")
+                            }
+                            console.log(resultJson);
+                        }
+                    });
+                } else {
+                    alert("cw");
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <form>
+        <div class="form-group">
+            <label for="exampleInputEmail1">身份证号</label>
+            <input type="email" class="form-control" id="txtId" placeholder="请输入身份证号">
+        </div>
+        <button type="button" class="btn btn-default">提交</button>
+    </form>
+</body>
+</html>

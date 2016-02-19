@@ -1,0 +1,45 @@
+﻿<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>根据IP获取地址</title>
+    <link href="//cdn.bootcss.com/bootstrap/4.0.0-alpha.2/css/bootstrap.min.css" rel="stylesheet">
+    <style type="text/css">
+        #divResult
+        {
+            width: 500px;
+            height: 100px;
+            border: 1px solid #ccc;
+            padding:10px;
+        }
+    </style>
+    <script src="http://cdn.hcharts.cn/jquery/jquery-2.1.4.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("button").click(function () {
+                $.ajax({
+                    type: "post",
+                    url: "/Shi/GetLocation",
+                    contentType: "application/json",
+                    success: function (result) {
+                        var resultJson = eval("(" + result + ")");
+                        if (resultJson.errMsg == "success") {
+                            $("#divResult").html("省：" + resultJson.retData.province
+                                + "，市：" + resultJson.retData.city
+                                );
+                        } else {
+                            alert("获取失败！")
+                        }
+                        console.log(resultJson);
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <div id="divResult" style="">
+    </div>
+    <button class="btn btn-default" style="margin:5px;">获取当前地址</button>
+</body>
+</html>
+

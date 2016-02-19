@@ -1,0 +1,55 @@
+﻿@{
+    ViewBag.Title = "上传简历，读取简历，";
+}
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>@ViewBag.Title</title>
+    <link href="~/Content/Bootstrap/bootstrap.min.css" rel="stylesheet" />
+    <script src="http://cdn.hcharts.cn/jquery/jquery-2.1.4.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("input[type='button']").click(function () {
+                $("input[type='file']").click();
+            });
+        });
+    </script>
+</head>
+<body>
+    @*<form enctype="multipart/form-data" action="/Shi/UploadFile" method="post" role="form">
+        <div class="form-group">
+            <label for="inputfile">文件输入</label>
+            <input type="file" id="inputfile">
+            <p class="help-block">这里是块级帮助文本的实例。</p>
+        </div>
+        <button type="submit" class="btn btn-danger">提交</button>
+    </form>*@
+    @*enctype= "multipart/form-data"是必需有的，否则action接收不到相应的file*@
+    @using (Html.BeginForm("UploadJianliRead", "Shi", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        <div class="col-sm-7">
+            <br />
+            <span>上传文件</span>
+            <br />
+            <input type="file" name="file1" style="display: none" />
+            <input type="button" class="btn btn-info" value="浏览" />
+            <input id="ButtonUpload" type="submit" value="提交" class="btn btn-default" />
+            <br />
+            <br />
+        </div>
+    }
+    <br /><br />
+    <div class="col-sm-7">
+        <div class="form-group">
+            <label for="name">姓名</label>
+            <input type="text" class="form-control" id="txtName"
+                placeholder="请输入姓名">
+        </div>
+        <div class="form-group">
+            <label for="name">邮箱</label>
+            <input type="text" class="form-control" id="txtEmail"
+                placeholder="请输入邮箱">
+        </div>
+    </div>
+</body>
+</html>

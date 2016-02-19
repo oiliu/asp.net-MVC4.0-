@@ -1,0 +1,23 @@
+﻿<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <script type="text/javascript" src="http://cdn.hcharts.cn/jquery/jquery-2.1.4.min.js"></script>
+    <script type="text/javascript">
+        (function () {
+            var num = 0;
+            var min = 1;
+            var max = 10;
+            $.post("/Shi/GetRandomOrg?num=1&min=10&max=20",
+                function (data) {
+                    if (data != "error") {
+                        alert(data);
+                    } else {
+                        alert("请求失败！");
+                    }
+                });
+        })();
+    </script>
+</head>
+<body>
+</body>
+</html>

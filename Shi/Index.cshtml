@@ -1,0 +1,142 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>@ViewBag.Title</title>
+    <link href="~/Content/pagination.css" rel="stylesheet" />
+    <link href="~/Content/Bootstrap/bootstrap.min.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery-1.11.1.min.js"></script>
+    <script src="~/Scripts/jquery.pagination.js"></script>
+    <script src="~/Scripts/Common.js"></script>
+    <script src="~/Scripts/avalon.min.js"></script>
+    <script type="text/javascript">
+        var avBody = avalon.define("avBody", function (vm) {
+            vm.searchShiName = "";
+            vm.shiName = "";
+            vm.shiList = [];
+            vm.upId = "";
+            vm.upshiName = "";
+            //分页参数
+            vm.pageIndex = 0;
+            vm.pageSize = 3;
+            //获取数据
+            vm.GetShilist = function () {
+                $.post("/Shi/GetShilist", {
+                    shiName: avBody.searchShiName,
+                    _PageIndex: avBody.pageIndex + 1,
+                    _PageSize: avBody.pageSize
+                }, function (result) {
+                    if (result.IsSuccess) {
+                        avBody.shiList = result.Data;
+                        $("#divPager").pagination(result.DataCount, {
+                            callback: avBody.PageSelectCallback,
+                            items_per_page: avBody.pageSize,
+                            current_page: avBody.pageIndex
+                        });
+                    } else {
+                        alert("获取数据失败！异常信息：" + result.Message);
+                    }
+                });
+            };
+            vm.PageSelectCallback = function (PageIndex) {
+                avBody.pageIndex = PageIndex;
+                $.post("/Shi/GetShilist", {
+                    shiName: avBody.searchShiName,
+                    _PageIndex: avBody.pageIndex + 1,
+                    _PageSize: avBody.pageSize
+                }, function (result) {
+                    if (result.IsSuccess) {
+                        avBody.shiList = result.Data;
+                    } else {
+                        alert("获取数据失败！异常信息：" + result.Message);
+                    }
+                });
+            };
+            vm.AddShi = function () {
+                $.post("/Shi/AddShi", {
+                    shiName: avBody.shiName
+                }, function (data) {
+                    if (data.IsSuccess) {
+                        avBody.GetShilist();
+                        alert("新增成功！");
+                    } else {
+                        alert("新增失败！异常信息：" + data.Message);
+                    }
+                });
+            };
+            vm.DelShi = function (el) {
+                if (confirm("确定删除吗？")) {
+                    $.post("/Shi/DelShi", {
+                        Id: el.Id
+                    }, function (data) {
+                        if (data.IsSuccess) {
+                            avBody.GetShilist();
+                            alert("删除成功！");
+                        } else {
+                            alert("删除失败！异常信息：" + data.Message);
+                        }
+                    });
+                };
+            };
+            vm.getlist = function () {
+            };
+            vm.ChakanShi = function (el) {
+                $.post("/Shi/GetModelShi", {
+                    Id: el.Id
+                }, function (data) {
+                    if (data.IsSuccess) {
+                        avBody.upId = data.Data[0].Id
+                        avBody.upshiName = data.Data[0].ShiName;
+                    } else {
+                        alert("查看失败！异常信息：" + data.Message);
+                    }
+                });
+            };
+            vm.UpShi = function () {
+                $.post("/Shi/UpShi", {
+                    Id: avBody.upId,
+                    ShiName: avBody.upshiName
+                }, function (data) {
+                    if (data.IsSuccess) {
+                        avBody.GetShilist();
+                        alert("修改成功！");
+                    } else {
+                        alert("修改失败！异常信息：" + data.Message);
+                    }
+                });
+            }
+        });
+        $(function () {
+            avBody.GetShilist();
+        });
+    </script>
+</head>
+<body>
+    <div ms-controller="avBody">
+        <p>
+            姓名：<input type="text" ms-duplex="searchShiName" />
+            <input value="查询" type="button" class="btn btn-primary btn-xs" ms-click="GetShilist" />
+        </p>
+        <div id="divList">
+            <ul ms-repeat="shiList">
+                <li style="width: 300px">{{el.ShiName}}
+                    <input value="查看" type="button" class="btn btn-primary btn-xs" ms-click="ChakanShi(el)" style="float: right" />
+                    <input value="删除" type="button" class="btn btn-primary btn-xs" ms-click="DelShi(el)" style="float: right" />
+                    <span style="float: right">{{el.CreateDate}}</span>
+                </li>
+            </ul>
+            <p id="divPager"></p>
+        </div>
+        <p>
+            姓名：<input type="text" ms-duplex="shiName" />
+            <input value="新增" type="button" class="btn btn-primary btn-xs" ms-click="AddShi" />
+        </p>
+        <p>
+            <input type="hidden" ms-duplex="upId" />
+            姓名：<input type="text" ms-duplex="upshiName" />
+            <input value="修改" type="button" class="btn btn-primary btn-xs" ms-click="UpShi" />
+        </p>
+    </div>
+</body>
+</html>

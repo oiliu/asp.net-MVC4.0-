@@ -1,0 +1,146 @@
+﻿<html>
+<head>
+    <title>动态添加图片</title>
+    <meta charset="utf-8" />
+    <link href="~/Content/Bootstrap/bootstrap.min.css" rel="stylesheet" />
+    <script type="text/javascript" src="http://cdn.hcharts.cn/jquery/jquery-2.1.4.min.js"></script>
+    <style>
+        .trends-images img
+        {
+            float: left;
+            height: 90px;
+            margin: 0 5px 5px 0;
+            width: 90px;
+        }
+
+        .images-form
+        {
+            float: left;
+            height: 90px;
+            position: relative;
+            width: 90px;
+        }
+
+        .images-file
+        {
+            cursor: pointer;
+            height: 90px;
+            left: 0;
+            opacity: 0;
+            position: absolute;
+            top: 0;
+            width: 90px;
+            z-index: 100;
+        }
+
+        .images-button
+        {
+            background: rgba(0, 0, 0, 0) url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFoAAABaCAIAAAC3ytZVAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAL1JREFUeNrs2r0KgCAUgNGMVjdXN9//VdzcfBC3pqBV6AfkfFtTcbhXKAq9901XOwIcOHDgwIEDBw4cOHDgwIEDBw4cOHAIBw4cOHDgwPFmx7+3r7XeL3POKSXTYVlw4MCBAwcOHDhwCAcOHJOFZ3/CHmO01r559BhjKcV0WBYcOJY7SmfzrdSy4MCBAwcOHDiEAwcOHDgWeME3HThw4MCBAwcOHMKBAwcOHDhw4MCBAwcOHDhw4MCxeqcAAwByahcPPSri8gAAAABJRU5ErkJggg==") no-repeat scroll 0 0;
+            cursor: pointer;
+            height: 90px;
+            left: 0;
+            line-height: 1;
+            position: absolute;
+            text-indent: -9999px;
+            top: 0;
+            width: 90px;
+            z-index: 1;
+        }
+    </style>
+    <script type="text/javascript">
+        function PreviewImage(obj, imgPreviewId, divPreviewId, callback) {
+            var allowExtention = ".jpg,.gif,.png"; //,允许上传文件的后缀名,.bmp
+            var extention = obj.value.substring(obj.value.lastIndexOf(".") + 1).toLowerCase();
+            var browserVersion = window.navigator.userAgent.toUpperCase();
+            if (allowExtention.indexOf(extention) > -1)
+            {
+                if (browserVersion.indexOf("MSIE") > -1)
+                {
+                    if (browserVersion.indexOf("MSIE 6.0") > -1) {//ie6
+                        document.getElementById(imgPreviewId).setAttribute("src", obj.value);
+                    } else {//ie[7-8]、ie9
+                        obj.select();
+                        var newPreview = document.getElementById(divPreviewId + "New");
+                        if (newPreview == null) {
+                            newPreview = document.createElement("div");
+                            newPreview.setAttribute("id", divPreviewId + "New");
+                            newPreview.style.width = 160;
+                            newPreview.style.height = 170;
+                            newPreview.style.border = "solid 1px #d2e2e2";
+                        }
+                        newPreview.style.filter = "progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod='scale',src='" + document.selection.createRange().text + "')";
+                        var tempDivPreview = document.getElementById(divPreviewId);
+                        tempDivPreview.parentNode.insertBefore(newPreview, tempDivPreview);
+                        tempDivPreview.style.display = "none";
+                    }
+                }else if (browserVersion.indexOf("FIREFOX") > -1)
+                {//firefox
+                    var firefoxVersion = parseFloat(browserVersion.toLowerCase().match(/firefox\/([\d.]+)/)[1]);
+                    if (firefoxVersion < 7)
+                    {//firefox7以下版本
+                        document.getElementById(imgPreviewId).setAttribute("src", obj.files[0].getAsDataURL());
+                    } else
+                    {//firefox7.0+
+                        document.getElementById(imgPreviewId).setAttribute("src", window.URL.createObjectURL(obj.files[0]));
+                    }
+                } else if (obj.files) {
+                    //兼容chrome、火狐等，HTML5获取路径                   
+                    if (typeof FileReader !== "undefined")
+                    {
+                        var reader = new FileReader();
+                        reader.onload = function (e) {
+                            document.getElementById(imgPreviewId).setAttribute("src", e.target.result);
+                        }
+                        reader.readAsDataURL(obj.files[0]);
+                    } else if (browserVersion.indexOf("SAFARI") > -1)
+                    {
+                        alert("暂时不支持Safari浏览器!");
+                    }
+                } else
+                {
+                    document.getElementById(divPreviewId).setAttribute("src", obj.value);
+                }
+                setTimeout(callback, 200);
+            } else {
+                alert("仅支持" + allowExtention + "为后缀名的文件!");
+                obj.value = ""; //清空选中文件
+                if (browserVersion.indexOf("MSIE") > -1) {
+                    obj.select();
+                    document.selection.clear();
+                }
+                obj.outerHTML = obj.outerHTML;
+            }
+        }
+        var i = 0;
+        function addImg(obj) {
+            i++;
+            $('#imgSrc').attr('src', '');//初始为空
+            PreviewImage(obj, 'imgSrc', 'imgSrc',
+                function () {
+                    var img_src = $('#imgSrc').attr('src');
+                    $(obj).attr('name', 'image_name[' + i + ']');
+                    if ('' != img_src) {
+                        $('#imgs').append('<img src="' + img_src + '" />');
+                        $('#imgs').append(obj);
+                        $(".images-group").append('<input type="file" onchange="addImg(this)" class="images-file" name="" />')
+                    }
+                });
+        }
+    </script>
+</head>
+<body>
+    <form enctype="multipart/form-data" action="/Shi/UploadFile" method="post" role="form">
+        <div class="trends-images clearfix" style="width: 500px;">
+            <div id="imgs"></div>
+            <img id="imgSrc" src="" style="display: none" />
+            <div class="images-form">
+                <div class="images-group">
+                    <div class="images-button">选择图片</div>
+                    <input type="file" onchange="addImg(this)" class="images-file" name="" />
+                </div>
+            </div>
+        </div>
+        <input type="submit" name="name" value="提交" class="btn btn-default" />
+    </form>
+</body>
+</html>
